@@ -1,0 +1,87 @@
+BUILDING THE IMAGE FROM THE YOCTO
+
+The Freescale Yocto Project BSP Release directory contains a "sources" directory, which contains the recipes used to build one or more build directories and a set of scripts used to set up the environment. 
+The recipes used to build the project come from both the community and Freescale. The Yocto Project layers are downloaded and placed in the sources directory.This sets up the recipes that are used to build the
+project.
+
+1 After setting the repo utility, Create a directory named 'aurora' in /users/stage3/mywork location
+
+$ mkdir aurora
+$ cd aurora
+$ repo init -u https://source.codeaurora.org/external/imx/fsl-arm-yocto-bsp -b imx-morty
+$ repo sync
+
+this going to take few minutes. 
+
+2. Setup the build folder by entering the following command
+
+$ MACHINE=imx6dlsabresd DISTRO=fsl-imx-x11 source ./fsl-setup-release.sh -b build (because we are building for Imx6 Dual lite sabre SD board)
+
+3 Edit the aurora/build/conf/local.conf file as follows which place the downloads, sstate-cache and tmp in the different location (This is necessary because this folders take lot of memory)
+
+MACHINE ??= 'imx6dlsabresd'
+DISTRO ?= 'fsl-imx-x11'
+PACKAGE_CLASSES ?= "package_rpm"
+EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
+USER_CLASSES ?= "buildstats image-mklibs image-prelink"
+PATCHRESOLVE = "noop"
+BB_DISKMON_DIRS = "\
+    STOPTASKS,${TMPDIR},1G,100K \
+    STOPTASKS,${DL_DIR},1G,100K \
+    STOPTASKS,${SSTATE_DIR},1G,100K \
+    STOPTASKS,/tmp,100M,100K \
+    ABORT,${TMPDIR},100M,1K \
+    ABORT,${DL_DIR},100M,1K \
+    ABORT,${SSTATE_DIR},100M,1K \
+    ABORT,/tmp,10M,1K"
+PACKAGECONFIG_append_pn-qemu-native = " sdl"
+PACKAGECONFIG_append_pn-nativesdk-qemu = " sdl"
+CONF_VERSION = "1"
+
+DL_DIR = "/home/hdd500Gb/aurora/build/downloads/"
+SSTATE_DIR = "/home/hdd500Gb/aurora/build/sstate-cache/"
+TMPDIR = "/home/hdd500Gb/aurora/build/tmp/"
+
+ACCEPT_FSL_EULA = "1"
+
+NOTE: If downloads, sstate-cache and tmp are not created in the desired location please edit the aurora/build/conf/local.conf.org file also same as local.conf
+
+4 This is optional. by default boot partition is 8MB but if you want to increase it, edit the /users/stage3/mywork/aurora/sources/meta-freescale/conf/machine/imx6dlsabresd.conf as follows
+
+#@TYPE: Machine
+#@NAME: NXP i.MX6DL SABRE Smart Device
+#@SOC: i.MX6DL
+#@DESCRIPTION: Machine configuration for NXP i.MX6DL SABRE Smart Device
+#@MAINTAINER: Otavio Salvador <otavio@ossystems.com.br>
+
+MACHINEOVERRIDES =. "mx6:mx6dl:"
+
+require conf/machine/include/imx6sabresd-common.inc
+
+KERNEL_DEVICETREE = "imx6dl-sabresd.dtb imx6dl-sabresd-ldo.dtb imx6dl-sabresd-hdcp.dtb \
+                     imx6dl-sabresd-enetirq.dtb imx6dl-sabresd-btwifi.dtb"
+
+UBOOT_CONFIG ??= "sd"
+UBOOT_CONFIG[sd] = "mx6dlsabresd_config,sdcard"
+UBOOT_CONFIG[epdc] = "mx6dlsabresd_epdc_config"
+UBOOT_CONFIG[mfgtool] = "mx6dlsabresd_config"
+
+MACHINE_FIRMWARE += "firmware-imx-epdc"
+
+BOOT_SPACE += "20480"
+
+NOTE: If you want to change boot space after bitbaking, you have to change the BOOT_SPACE = "Desired value" and you have to enter the command below before bitbaking again
+
+$ bitbake -c cleanall fsl-image-qt5 or $ bitbake -c cleanall core-image-minimal
+
+5. Now you can bitbake what ever image we want by following command
+
+$ bitbake fsl-image-qt5 or bitbake core-image-minimal
+
+this process may take few hours depending on the computer which you are using. 
+
+NOTE : Sometimes you may get errors also. please check for the solutions in NXP forums. Make sure that you have "make" version 4.1 or above.
+
+After the end of the building, you can find images in the following folder
+
+/home/hdd500Gb/aurora/build/tmp/deploy/images/imx6dlsabresd

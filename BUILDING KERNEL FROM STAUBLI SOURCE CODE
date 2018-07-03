@@ -1,0 +1,89 @@
+BUILDING THE KERNEL FROM STAUBLI SOURCE CODE
+
+1. Download the source code by following command
+
+$ git clone git://fav10lin.staubli.pri/linux-2.6-imx.git
+
+2. Change the cloned directory name to "linux-imx" and assign the remote name as follows
+
+$ git remote add aurora https://source.codeaurora.org/external/imx/linux-imx
+
+3. Fetch and Checkout to aurora branch with following command
+
+$ git fetch aurora
+$ git checkout aurora/imx_4.9.11_1.0.0_ga
+
+4. The next task is to build the cross compiler tools, To do it first of all create an empty directory named as "tools" in the following directory 
+
+/users/stage3/mywork/tools/meta-toolchain
+
+5. Go to /users/stage3/aurora and enter following commands
+
+$ MACHINE=imx6dlsabresd DISTRO=fsl-imx-x11 source ./fsl-setup-release.sh -b build
+
+$ bitbake meta-toolchain
+
+6. The above procedure will produce a directory named as "sdk" in the home/hdd500Gb/aurora/build/tmp/deploy/sdk directory. 
+
+7. Open the sdk directory and click on "fsl-imx-x11-glibc-x86_64-meta-toolchain-cortexa9hf-neon-toolchain-4.9.11-1.0.0.sh"; this leads to a terminal asking you a path to install the compiler tools
+give the path as /users/stage3/mywork/tools/meta-toolchain/ and continue the installation
+
+8. In order to set the environment varaibles, enter the following command
+
+$ source /home/hdd500Gb/tools/environment-setup-cortexa9hf-neon-poky-linux-gnueabi
+
+this will automatically set all the needed required parameters 
+
+NOTE : this above step should be repeated when ever you want to perform some changes to kernel
+
+9. for i.MX6, configure the kernel options based on file imx_v7_defconfig which is indeed located in /home/hdd500Gb/linux-imx/arch/arm/configs by following command
+
+$ make imx_v7_defconfig
+
+if you need some changes in the configuration, use 
+
+$ make menuconfig
+
+10. To build the kernel, use the make command and the load address of processor being used i.e For i.MX6Quad and Dual, LOADADDR = 0x10008000
+
+$ make uImage LOADADDR=0x10008000
+
+this might take some time to build and after finishing, the output is located in the following directory
+
+/home/hdd500Gb/linux-imx/arch/arm/boot
+
+11. the above step results only uImage file but to build the kernel modules, use following command
+
+$ make modules
+
+it will take some time to build, after that install them by using following command
+
+$ make modules_install INSTALL_MOD_PATH=/users/stage3/mywork/Installed_modules
+
+(You can also install them in customized location also)
+
+12. In order to build the dtb files, open terminal in /home/hdd500Gb/linux-imx
+
+$ source /home/hdd500Gb/tools/environment-setup-cortexa9hf-neon-poky-linux-gnueabi
+
+NOTE: Please make sure that device-tree-complier package is installed in your linux machine before running the below commands.
+
+$ make imx6dl-unicpu-fav1024768.dtb
+
+SPECIFIC PROCEDURE FOR UNICPU
+
+13. Replace all files of /media/stage3/boot imx6dl with newly created by using "sudo cp -R <soucre file address> <destination address>"
+
+uImage from /home/hdd500Gb/linux-imx/arch/arm/boot
+.dtb files from /home/hdd500Gb/linux-imx/arch/arm/boot/dts
+Modules from /home/hdd500Gb/linux-imx/stage3 or location where you installed modules
+
+14. Acquire and Copy the "boot_unicpu.scr" and "imx6dl-unicpu-fav1024768.dtb" into "/media/stage3/Boot imx6dl" directory
+
+15. Acquire and Flash the "u-boot-with-spl.imx" file by using following command 
+
+$ sudo dd if=u-boot-with-spl.imx of=/dev/sdc bs=1k seek=1 conv=fsync
+$ sync
+
+
+

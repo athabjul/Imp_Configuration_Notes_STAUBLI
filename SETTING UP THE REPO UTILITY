@@ -1,0 +1,12 @@
+Setting Up the Repo Utility
+
+1. Create a bin folder in your home directory
+
+$ cd ~
+$ mkdir ~/bin (this step may not be needed if the bin folder already exists)
+$ curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+$ chmod a+x ~/bin/repo
+
+2. Add the following line to the .bashrc file to ensure that the ~/bin folder is in your PATH variable
+
+$ export PATH=~/bin:$PATH

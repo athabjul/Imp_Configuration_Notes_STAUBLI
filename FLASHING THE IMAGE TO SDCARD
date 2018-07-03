@@ -1,0 +1,24 @@
+FLASHING THE BUILT IMAGE TO SDCARD
+
+After the completion of build, From the directory /home/hdd500Gb/aurora/tmp/deploy/images/imx6dlsabresd the file with .sdcard extension is used for flashing (just .sdcard but not .rootfs.sdcard file] 
+
+1. Open the terminal in the location /home/hdd500Gb/aurora/tmp/deploy/images/imx6dlsabresd
+
+2. To the address of the inserted sdcard, enter following command
+
+$ cat /proc/partitions (You can inserted sdcard in /dev/sdc)
+
+3. To flash into the sdcard, enter following command
+
+$ sudo dd if=fsl-image-qt5-imx6dlsabresd.sdcard  of=/dev/sdc bs=1M conv=fsync or $ sudo dd if=core-image-minimal-imx6dlsabresd.sdcard  of=/dev/sdc bs=1M conv=fsync
+
+Enter the your password and it will take 5-7 minutes.
+
+NOTE:
+Please be careful in chosing the correct location of inserted sdcard i.e. of=/dev/sdc 
+
+$ sync
+$ sync
+
+for this command just take out the sdcard and insert it into slot provided in the IMX6DLSABRESD board and power it up.
+
