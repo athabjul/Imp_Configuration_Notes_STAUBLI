@@ -1,0 +1,37 @@
+HOW TO ENABLE USB FOR USING MOUSE
+
+1. Open the terminal in /home/hdd500Gb/linux-imx
+
+2. Enter the following command 
+
+$ source /home/hdd500Gb/tools/environment-setup-cortexa9hf-neon-poky-linux-gnueabi
+
+3. Enter the following command
+
+$ make menuconfig
+
+NOTE : Before entering the above command please make sure to install the following two packages
+
+1. libncurses5-dev
+2. libncursesw5-dev
+
+by using following command 
+
+$ sudo apt-get install libncurses5-dev libncursesw5-dev
+
+4. In menuconfig window
+
+Device Drivers/HID support
+
+Press 'y' for "Generic HID driver"
+
+Make and save this changes.
+
+5. Enter the following command for making the uImage
+
+$ make uImage LOADADDR=0x10008000
+
+6. copy the created uImage which is in /home/hdd500Gb/linux-imx/arch/arm/boot into the SD card in 
+
+/Boot imx6dl partition.
+ 

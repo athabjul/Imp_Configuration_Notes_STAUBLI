@@ -1,0 +1,22 @@
+HOW TO ENABLE USB
+
+1. Open the terminal in /home/hdd500Gb/linux-imx
+
+2. Enter the following command 
+
+$ source /home/hdd500Gb/tools/environment-setup-cortexa9hf-neon-poky-linux-gnueabi
+
+3. Enter the following command
+
+$ make menuconfig
+
+NOTE : Before entering the above command please make sure to install the following two packages
+
+1. libncurses5-dev
+2. libncursesw5-dev
+
+by using following command 
+
+$ sudo apt-get install libncurses5-dev libncursesw5-dev
+
+4. In menuconfig window

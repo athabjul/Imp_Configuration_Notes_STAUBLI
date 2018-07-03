@@ -1,0 +1,31 @@
+ETHERNET ENABLING PROCEDURE
+
+1. Add the following block into the /home/hdd500Gb/linux-imx/arch/arm/boot/dts/imx6qdl-unicpu.dtsi
+
+&clks {
+    assigned-clocks = <&clks IMX6QDL_CLK_ENET_REF>;
+    assigned-clock-rates = <50000000>;
+};
+
+&fec {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_enet>;
+//	phy-connection-type = "rmii";
+	phy-mode = "rmii";
+	phy-reset-gpios = <&gpio7 7 0>;
+	phy-reset-duration = <2>;
+//  clocks = <&clks IMX6QDL_CLK_ENET>, <&clks IMX6QDL_CLK_ENET>, <&rmii_clk>;
+	status = "okay";
+};
+
+After doing the above changes,  make and copy the "imx6dl-unicpu-fav1024768.dtb" into sdcard
+
+2. Unmask the connman service by using the following commands
+
+$ root
+$ systemctl unmask connman.service
+$ systemctl start connman.service
+
+3. verify whether you can see the eth0 or not by following command
+
+$ ifconfig
