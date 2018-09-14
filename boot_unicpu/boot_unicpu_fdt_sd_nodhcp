@@ -1,0 +1,35 @@
+# U-boot script sur carte SD - avec dtb
+#
+# Boot a Linux kernel from the SD card. The scipt and the uImage are located
+# in the first partition of the SD card. It is a DOS partition.
+# Screens: 800x600 FAV-LDB-SVGA, 1024x768 SAR-LDB-XVGA
+
+setenv loadaddr 10800000
+setenv dtaddr 12000000
+
+setenv mmcdev 1
+# Root pour le noyau: mmcblk1p2 pour SD
+setenv rootdev /dev/mmcblk3p2
+
+if test $baseboard_id -eq 20 ; then
+  setenv dtfile imx6dl-unicpu-sar800600.dtb
+else
+  if test $x -eq 800 ; then
+    setenv dtfile imx6dl-unicpu-fav800600.dtb
+  else
+    setenv dtfile imx6dl-unicpu-fav1024768.dtb
+  fi
+fi
+
+
+# Argument du noyau
+setenv bootargs "console=ttymxc0,115200 root=$rootdev rootwait=1 quiet loglevel=3 vga=current rd.systemd.show_status=auto rd.udev.log_priority=3 silent=y verify=n lpj=30000 vt.global_cursor_default=0"
+
+if load mmc $mmcdev:1 $loadaddr uImage ; then
+   if load mmc $mmcdev:1 $dtaddr $dtfile ; then
+       bootm $loadaddr - $dtaddr
+   fi
+fi
+
+#setenv bootargs "console=ttymxc0,115200 root=$rootdev rootwait=1 quiet loglevel=3 vga=current rd.systemd.show_status=auto rd.udev.log_priority=3 silent=y verify=n lpj=30000 vt.global_cursor_default=0 "
+
